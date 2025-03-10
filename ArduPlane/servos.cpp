@@ -195,6 +195,9 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
     // out1: elevon_left
     // out2: elevon_right
 
+    float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
+    float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+
     if (in1 > 0) {
         float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
         float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
@@ -205,9 +208,6 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
         float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
         float out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
     }
-    
-    //float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
-    //float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
     
     SRV_Channels::set_output_scaled(func1_out, out1);
     SRV_Channels::set_output_scaled(func2_out, out2);
