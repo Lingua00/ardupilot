@@ -188,9 +188,27 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
     } else if (g.mixing_offset > 0) {
         in1 *= (100 + g.mixing_offset) * 0.01;
     }
+
+    // code added 10/03 for Paramotor purposes
+    // in1: k_ail
+    // in2: k_elev
+    // out1: elevon_left
+    // out2: elevon_right
+
+    if (in1 > 0) {
+        float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+    } else if (in1 < 0) {
+        float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
+        float out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+    } else {
+        float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        float out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+    }
     
-    float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
-    float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+    //float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
+    //float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+    
     SRV_Channels::set_output_scaled(func1_out, out1);
     SRV_Channels::set_output_scaled(func2_out, out2);
 }
