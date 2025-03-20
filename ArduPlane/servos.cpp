@@ -201,6 +201,10 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
     if (in1 > 0) {
         float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
         float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+            if (out2 == 4500) {
+                //float excess = (out2+out1 - 4500)/2;
+                out1 -= out1*0.5;
+            }
         SRV_Channels::set_output_scaled(func1_out, out1);
         SRV_Channels::set_output_scaled(func2_out, out2);
     } else if (in1 < 0) {
