@@ -189,7 +189,7 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
         in1 *= (100 + g.mixing_offset) * 0.01;
     }
 
-    // code added 10/03 for Paramotor purposes
+    // code added 21/03 for Paramotor purposes
     // in1: k_ail
     // in2: k_elev
     // out1: elevon_left
@@ -198,6 +198,31 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
     //float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
     //float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
 
+    float out1;
+    float out2;
+
+    if (in1 > 0) {
+        out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+            if (out2 > 4490.0f) {
+                //float excess = (out2+out1 - 4500)/2;
+                out1 -= out1*0.5;
+            }
+        SRV_Channels::set_output_scaled(func1_out, out1);
+        SRV_Channels::set_output_scaled(func2_out, out2);
+    } else if (in1 < 0) {
+        out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
+        out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        SRV_Channels::set_output_scaled(func1_out, out1);
+        SRV_Channels::set_output_scaled(func2_out, out2);
+    } else {
+        out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+        SRV_Channels::set_output_scaled(func1_out, out1);
+        SRV_Channels::set_output_scaled(func2_out, out2);
+    }
+
+/*
     if (in1 > 0) {
         float out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
         float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
@@ -218,9 +243,7 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
         SRV_Channels::set_output_scaled(func1_out, out1);
         SRV_Channels::set_output_scaled(func2_out, out2);
     }
-    
-    //SRV_Channels::set_output_scaled(func1_out, out1);
-    //SRV_Channels::set_output_scaled(func2_out, out2);
+    /*
 }
 
 
