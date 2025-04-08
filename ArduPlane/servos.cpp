@@ -234,29 +234,43 @@ void Plane::channel_function_mixer(SRV_Channel::Function func1_in, SRV_Channel::
     if (in1 > 0) {
         float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
         float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
-            if (out1 < -4490.0f) {
-                float excess_out1 = (in2+in1 + 4500);
-                in2 += excess_out1;
-                out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
+            if (out1 < -4490.0f && out2 < 4490.0f) {
+                float excess_out1 = (in2-in1 + 4500);
+                in2 -= excess_out1;
+                out1 = constrain_float(-4500 * g.mixing_gain, -4500, 4500);
                 out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
             }
-            if (out2 > 4490.0f) {
+            if (out2 > 4490.0f && out1 > -4490.0f) {
                 float excess_out2 = (in2+in1 - 4500);
                 in2 -= excess_out2;
-                out1 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
-                out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+                out1 = constrain_float((in2-in1) * g.mixing_gain, -4500, 4500);
+                out2 = constrain_float( 4500 * g.mixing_gain, -4500, 4500);
+            }
+            if (out2 > 4490.0f && out1 < -4490.0f) {
+                out1 = constrain_float(-4500 * g.mixing_gain, -4500, 4500);
+                out2 = constrain_float( 4500 * g.mixing_gain, -4500, 4500);
             }
         SRV_Channels::set_output_scaled(func1_out, out1);
         SRV_Channels::set_output_scaled(func2_out, out2);
     } else if (in1 < 0) {
         float out1 = constrain_float((in2 - in1) * g.mixing_gain, -4500, 4500);
-        float out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
-        if (out1 > 4490.0f) {
-                float excess = (in2-in1 - 4500);
-                in2 -= excess;
+        float out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+        if (out2 < -4490.0f && out1 < 4490.0f) {
+                float excess_out3 = (in2+in1 + 4500);
+                in2 -= excess_out3;
                 out1 = constrain_float((in2-in1) * g.mixing_gain, -4500, 4500);
-                out2 = constrain_float((in2) * g.mixing_gain, -4500, 4500);
+                out2 = constrain_float(-4500 * g.mixing_gain, -4500, 4500);
             }
+        if (out1 > 4490.0f && out2 > -4490.0f) {
+            float excess_out4 = (in2-in1 - 4500);
+            in2 -= excess_out4;
+            out1 = constrain_float( 4500 * g.mixing_gain, -4500, 4500);
+            out2 = constrain_float((in2 + in1) * g.mixing_gain, -4500, 4500);
+        }
+        if (out1 > 4490.0f && out2 < -4490.0f) {
+            out1 = constrain_float( 4500 * g.mixing_gain, -4500, 4500);
+            out2 = constrain_float(-4500 * g.mixing_gain, -4500, 4500);
+        }
         SRV_Channels::set_output_scaled(func1_out, out1);
         SRV_Channels::set_output_scaled(func2_out, out2);
     } else {
